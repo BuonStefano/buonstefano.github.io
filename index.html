@@ -11,16 +11,16 @@
   </style>
 </head>
 <body>
-  <h1>Excel → JSON</h1>
+  <h1>Excel → JSON (1.0)</h1>
   <input type="file" id="file" accept=".xls,.xlsx">
   <p id="stato">Seleziona un file .xls o .xlsx. Il risultato appare nella console (F12).</p>
 
   <script>
     const input = document.getElementById('file');
     const stato = document.getElementById('stato');
-    #
-    # Detect file type
-    #
+    <!--
+      Detect file type and translate into json object
+      -->
     input.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
