@@ -1,4 +1,59 @@
-This is file index.html
-<strong>Text Strong</strong>
-<i>Italic</i>
-Save test
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Excel → JSON</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    #stato { margin-top: 1rem; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Excel → JSON</h1>
+  <input type="file" id="file" accept=".xls,.xlsx">
+  <p id="stato">Seleziona un file .xls o .xlsx. Il risultato appare nella console (F12).</p>
+
+  <script>
+    const input = document.getElementById('file');
+    const stato = document.getElementById('stato');
+
+    input.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = (ev) => {
+        try {
+          const workbook = XLSX.read(ev.target.result, { type: 'array' });
+
+          // Un oggetto con una chiave per ogni foglio: { NomeFoglio: [ {col: valore, ...}, ... ] }
+          const risultato = {};
+          workbook.SheetNames.forEach((nome) => {
+            risultato[nome] = XLSX.utils.sheet_to_json(workbook.Sheets[nome], {
+              defval: ''   // celle vuote -> stringa vuota invece di chiave mancante
+            });
+          });
+
+          console.log(risultato);
+          // Per vedere il JSON come testo:
+          // console.log(JSON.stringify(risultato, null, 2));
+
+          stato.textContent = `Letti ${workbook.SheetNames.length} fogli da "${file.name}". Controlla la console.`;
+        } catch (err) {
+          console.error('Errore nella lettura del file:', err);
+          stato.textContent = 'Errore nella lettura del file.';
+        }
+      };
+
+      reader.onerror = () => {
+        stato.textContent = 'Impossibile leggere il file.';
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+  </script>
+</body>
+</html>
