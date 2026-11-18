@@ -18,30 +18,24 @@
   <script>
     const input = document.getElementById('file');
     const stato = document.getElementById('stato');
-
+    #
+    # Detect file type
+    #
     input.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
-
       reader.onload = (ev) => {
         try {
           const workbook = XLSX.read(ev.target.result, { type: 'array' });
-
-          // Un oggetto con una chiave per ogni foglio: { NomeFoglio: [ {col: valore, ...}, ... ] }
-          const risultato = {};
-          workbook.SheetNames.forEach((nome) => {
-            risultato[nome] = XLSX.utils.sheet_to_json(workbook.Sheets[nome], {
-              defval: ''   // celle vuote -> stringa vuota invece di chiave mancante
-            });
+          const sheetName = workbook.SheetNames[0];
+          const result = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+            defval: ''
           });
 
-          console.log(risultato);
-          // Per vedere il JSON come testo:
-          // console.log(JSON.stringify(risultato, null, 2));
+          console.log(result);
 
-          stato.textContent = `Letti ${workbook.SheetNames.length} fogli da "${file.name}". Controlla la console.`;
+          stato.textContent = `Lettura completata.`;
         } catch (err) {
           console.error('Errore nella lettura del file:', err);
           stato.textContent = 'Errore nella lettura del file.';
